@@ -1,26 +1,35 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMethod(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	req, _ := http.NewRequest("GET", "/api/v1/PersonId/Id456", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/stations/1", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth("admin", "admin")
 	router := gin.Default()
-	// router.GET("/api/v1/stations/:id", GetStationById)
 
-	// Create a response recorder so you can inspect the response
+	s := Station{StationId: "1", Name: "Test", ShortName: "Short Test Name"}
+	stations := &StationsData{Data: Stations{Stations: []Station{s}}}
+
+	router.GET("/api/v1/stations/:id", func(c *gin.Context) {
+		GetStationById(c, stations)
+	})
 	w := httptest.NewRecorder()
-
-	// Perform the request
 	router.ServeHTTP(w, req)
-	fmt.Println(w.Body)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var station Station
+	err := json.Unmarshal([]byte(w.Body.String()), &station)
+	assert.Nil(t, err)
+	assert.Equal(t, station.Name, "Test")
+	assert.Equal(t, station.ShortName, "Short Test Name")
 }
