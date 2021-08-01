@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"sort"
 	"strconv"
 	"time"
 
-	"path"
-
 	"github.com/gin-gonic/gin"
 )
-
-const tripsFilePath = "../resources/Divvy_Trips_2019_Q2"
 
 type RiderSummaryRequest struct {
 	Filters RiderSummaryRequestFilters `json:"filters"`
@@ -97,7 +94,7 @@ func GetTripsSummary(c *gin.Context, trips *[]Rental) {
 	}
 	sort.Slice(filterd, func(i, j int) bool { return filterd[i].EndTime.After(filterd[j].EndTime) })
 	for _, r := range filterd {
-		val, _ := m[strconv.Itoa(r.EndStationID)]
+		val := m[strconv.Itoa(r.EndStationID)]
 		date := r.EndTime.Format("2006-01-02")
 		_, ok := val[date]
 		if ok {
@@ -153,7 +150,6 @@ func contains(s []int, str int) bool {
 
 func getAgeGroup(birthYear int) string {
 	age := time.Now().Year() - birthYear
-	// [0-20,21-30,31-40,41-50,51+, unknown]
 	switch {
 	case age >= 0 && age <= 20:
 		return "0-20"
