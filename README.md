@@ -35,3 +35,8 @@ curl --location --request POST 'http://localhost:8081/api/v1/trips/summary' \
 }'
 ```
 
+## How to run tests?
+
+```
+cd cmd && go test
+```
