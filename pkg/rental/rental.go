@@ -2,11 +2,14 @@ package rental
 
 import (
 	"encoding/csv"
+	"fmt"
 	"net/http"
 	"os"
 	"sort"
 	"strconv"
 	"time"
+
+	"path"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,7 +41,8 @@ type Rental struct {
 
 func LoadTripsData() (*[]Rental, error) {
 	rentals := []Rental{}
-	f, err := os.Open(tripsFilePath)
+	dirname, _ := os.Getwd()
+	f, err := os.Open(path.Join(dirname, "resources/Divvy_Trips_2019_Q2"))
 	if err != nil {
 		return &rentals, err
 	}
@@ -115,6 +119,7 @@ func GetRidersSummary(c *gin.Context, trips *[]Rental) {
 	}
 
 	m := make(map[string]map[string]map[string]int)
+	fmt.Println(len(*trips))
 	for _, trip := range *trips {
 		if contains(riderSummaryRequest.Filters.StationIds, trip.EndStationID) {
 			date := trip.EndTime.Format("2006-01-02")
